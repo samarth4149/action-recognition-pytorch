@@ -5,6 +5,14 @@ import torch
 from PIL import Image
 import torch.utils.data as data
 
+try:
+    import av
+    import skvideo.io as sio
+    _HAS_PYAV = True
+except ImportError:
+    #print("PyAV is not available, won't be able to use online decoding.")
+    _HAS_PYAV = False
+
 
 def random_clip(video_frames, sampling_rate, frames_per_clip, fixed_offset=False):
     """
@@ -297,3 +305,146 @@ class VideoDataSet(data.Dataset):
 
     def __len__(self):
         return len(self.video_list)
+
+
+class VideoDataSetOnline(VideoDataSet):
+
+    def __init__(self, root_path, list_file, num_groups=8, frames_per_group=1, sample_offset=0,
+                 num_clips=1, modality='rgb', dense_sampling=False, fixed_offset=True,
+                 image_tmpl='{:05d}.jpg', transform=None, is_train=True, test_mode=False, seperator=' ',
+                 filter_video=0, num_classes=None):
+        """
+        Arguments have different meaning when dense_sampling is True:
+            - num_groups ==> number of frames
+            - frames_per_group ==> sample every K frame
+            - sample_offset ==> number of clips used in validation or test mode
+        Args:
+            root_path (str): the file path to the root of video folder
+            list_file (str): the file list, each line with folder_path, start_frame, end_frame, label_id
+            num_groups (int): number of frames per data sample
+            frames_per_group (int): number of frames within one group
+            sample_offset (int): used in validation/test, the offset when sampling frames from a group
+            modality (str): rgb or flow
+            dense_sampling (bool): dense sampling in I3D
+            fixed_offset (bool): used for generating the same videos used in TSM
+            image_tmpl (str): template of image ids
+            transform: the transformer for preprocessing
+            is_train (bool): shuffle the video but keep the causality
+            test_mode (bool): testing mode, no label
+            fps (float): frame rate per second, used to localize sound when frame idx is selected.
+            audio_length (float): the time window to extract audio feature.
+            resampling_rate (int): used to resampling audio extracted from wav
+        """
+
+        if not _HAS_PYAV:
+            raise ValueError("Need to have pyav library.")
+        if modality not in ['rgb', 'rgbdiff']:
+            raise ValueError("modality should be 'rgb' or 'rgbdiff'.")
+
+        super().__init__(root_path, list_file, num_groups, frames_per_group, sample_offset,
+                       num_clips, modality, dense_sampling, fixed_offset,
+                       image_tmpl, transform, is_train, test_mode, seperator,
+                       filter_video, num_classes)
+
+    def remove_data(self, idx):
+        original_video_num = len(self.video_list)
+        self.video_list = [v for i, v in enumerate(self.video_list) if i not in idx]
+        print("Original videos: {}\t remove {} videos, remaining {} videos".format(original_video_num, len(idx), len(self.video_list)))
+
+    def get_data(self, record, indices):
+        indices = indices - 1
+        container = av.open(os.path.join(self.root_path, record.path))
+        container.streams.video[0].thread_type = "AUTO"
+        frames_length = container.streams.video[0].frames
+        duration = container.streams.video[0].duration
+        if duration is None or frames_length == 0:
+            # If failed to fetch the decoding information, decode the entire video.
+            #video_start_pts, video_end_pts = 0, math.inf
+            decode_all = True
+        else:
+            # Perform selective decoding.
+            if frames_length != record.num_frames:
+                # remap the index
+                length_ratio = frames_length / record.num_frames
+                indices = np.around(indices * length_ratio).astype(int)
+            start_idx, end_idx = min(indices), max(indices)
+            #if self.modality == 'rgbdiff':
+            #    end_idx += (self.num_consecutive_frames + 1)
+            timebase = duration / frames_length
+            video_start_pts = int(start_idx * timebase)
+            video_end_pts = int(end_idx * timebase)
+            decode_all = False
+
+        def _selective_decoding(container, index, timebase):
+            margin = 1024
+            start_idx, end_idx = min(index), max(index)
+            video_start_pts = int(start_idx * timebase)
+            video_end_pts = int(end_idx * timebase)
+            seek_offset = max(video_start_pts - margin, 0)
+            container.seek(seek_offset, any_frame=False, backward=True,
+                           stream=container.streams.video[0])
+            success = True
+            video_frames = None
+            try:
+                frames = {}
+                for frame in container.decode({'video': 0}):
+                    if frame.pts < video_start_pts:
+                        continue
+                    if frame.pts <= video_end_pts:
+                        frames[frame.pts] = frame
+                    else:
+                        break
+                # the decoded frames is a whole region but we might subsample it
+                video_frames = np.asarray([frames[pts].to_rgb().to_ndarray() for pts in sorted(frames)])
+                index = np.linspace(0, max(0, len(video_frames)-1), num=self.num_frames, dtype=int)
+                if len(video_frames) == 0: #somehow decoding is wrong
+                    success = False
+                else:
+                    video_frames = video_frames[index, ...]
+            except Exception as e:
+                success = False
+
+            return video_frames, success
+
+        # If video stream was found, fetch video frames from the video.
+        # Seeking in the stream is imprecise. Thus, seek to an ealier PTS by a
+        # margin pts.
+        if not decode_all:
+            timebase = duration / frames_length
+            video_frames = None
+            for i in range(self.num_clips):
+                curr_index = indices[(i) * self.num_frames: (i+1) * self.num_frames]
+                curr_video_frames, success = _selective_decoding(container, curr_index, timebase)
+                if not success:
+                    decode_all = True
+                    break
+                if video_frames is not None:
+                    video_frames = np.concatenate((video_frames, curr_video_frames), axis=0)
+                else:
+                    video_frames = curr_video_frames
+        if decode_all:
+            video_frames = sio.vread(container.name)
+            total_frames = len(video_frames)
+            if total_frames != record.num_frames:
+                # remap the index
+                length_ratio = total_frames / record.num_frames
+                indices = np.around(indices * length_ratio).astype(int)
+            video_frames = video_frames[indices, ...]
+
+            """
+            if self.modality == 'rgbdiff':
+                video_diff = np.asarray(video_frames[1:, ...].copy(), dtype=np.float) - np.asarray(video_frames[:-1, ...].copy(), dtype=np.float)
+                video_diff += 255.0
+                video_diff *= (255.0 / float(2 * 255.0))
+                video_diff = video_diff.astype(np.uint8)
+                for seg_ind in indices:
+                    new_seg_ind = [min(seg_ind + i, total_frames - 1)
+                                   for i in range(self.num_consecutive_frames) ]
+                    
+                video_frames = video_diff
+            else:
+            """
+        images = [Image.fromarray(frame) for frame in video_frames]
+        # TODO: support rgb diff, calculate end_pts differently.
+        container.close()
+        return images

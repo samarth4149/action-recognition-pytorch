@@ -20,8 +20,17 @@ from models import build_model
 from utils.utils import (train, validate, build_dataflow, get_augmentor,
                          save_checkpoint)
 from utils.video_dataset import VideoDataSet
+from utils.video_dataset import VideoDataSetOnline
 from utils.dataset_config import get_dataset_config
 from opts import arg_parser
+
+try:
+    import av
+    import skvideo.io as sio
+    _HAS_PYAV = True
+except ImportError:
+    #print("PyAV is not available, won't be able to use online decoding.")
+    _HAS_PYAV = False
 
 
 def main():
@@ -157,12 +166,12 @@ def main_worker(gpu, ngpus_per_node, args):
                                   is_flow=True if args.modality == 'flow' else False,
                                   version=args.augmentor_ver)
 
-    val_dataset = VideoDataSet(args.datadir, val_list, args.groups, args.frames_per_group,
-                               num_clips=args.num_clips,
-                               modality=args.modality, image_tmpl=image_tmpl,
-                               dense_sampling=args.dense_sampling,
-                               transform=val_augmentor, is_train=False, test_mode=False,
-                               seperator=filename_seperator, filter_video=filter_video)
+    val_dataset = VideoDataSetOnline(args.datadir, val_list, args.groups, args.frames_per_group,
+                                     num_clips=args.num_clips,
+                                     modality=args.modality, image_tmpl=image_tmpl,
+                                     dense_sampling=args.dense_sampling,
+                                     transform=val_augmentor, is_train=False, test_mode=False,
+                                     seperator=filename_seperator, filter_video=filter_video)
 
     val_loader = build_dataflow(val_dataset, is_train=False, batch_size=args.batch_size,
                                 workers=args.workers,
@@ -198,12 +207,12 @@ def main_worker(gpu, ngpus_per_node, args):
                                     is_flow=True if args.modality == 'flow' else False,
                                     version=args.augmentor_ver)
 
-    train_dataset = VideoDataSet(args.datadir, train_list, args.groups, args.frames_per_group,
-                                 num_clips=args.num_clips,
-                                 modality=args.modality, image_tmpl=image_tmpl,
-                                 dense_sampling=args.dense_sampling,
-                                 transform=train_augmentor, is_train=True, test_mode=False,
-                                 seperator=filename_seperator, filter_video=filter_video)
+    train_dataset = VideoDataSetOnline(args.datadir, train_list, args.groups, args.frames_per_group,
+                                       num_clips=args.num_clips,
+                                       modality=args.modality, image_tmpl=image_tmpl,
+                                       dense_sampling=args.dense_sampling,
+                                       transform=train_augmentor, is_train=True, test_mode=False,
+                                       seperator=filename_seperator, filter_video=filter_video)
 
     train_loader = build_dataflow(train_dataset, is_train=True, batch_size=args.batch_size,
                                   workers=args.workers, is_distributed=args.distributed)
