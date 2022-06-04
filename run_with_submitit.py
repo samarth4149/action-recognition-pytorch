@@ -4,6 +4,7 @@
 A script to run multinode training with submitit.
 """
 import argparse
+from audioop import add
 import os
 import uuid
 from pathlib import Path
@@ -18,7 +19,7 @@ import torch.multiprocessing as mp
 
 def parse_args(get_defaults=False):
     classification_parser = arg_parser()
-    parser = argparse.ArgumentParser("Submitit for Action Recognition", parents=[classification_parser])
+    parser = argparse.ArgumentParser("Submitit for Action Recognition", parents=[classification_parser], add_help=False)
     parser.add_argument("--ngpus", default=1, type=int, help="Number of gpus to request on each node")
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
     parser.add_argument("--timeout", default=360, type=int, help="Duration of the job")
