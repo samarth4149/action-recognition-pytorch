@@ -13,6 +13,7 @@ from models.model_builder import build_model
 from train import main_worker
 from opts import arg_parser
 # from classifier.config import ClassifierConfig
+import torch
 import submitit
 import torch.multiprocessing as mp
 from utils.dataset_config import get_dataset_config
@@ -97,8 +98,10 @@ class Trainer(object):
 
 
 def main1(args):
+    args.num_classes = get_dataset_config(args.dataset)[0]
+    _, args.arch_name = build_model(args)
     if args.job_dir == "":
-        args.job_dir = os.path.join(args.logdir, 'slurm')
+        args.job_dir = os.path.join(args.logdir, args.arch_name, 'slurm')
 
     # Note that the folder will depend on the job_id, to easily track experiments
     executor = submitit.AutoExecutor(folder=args.job_dir, slurm_max_num_timeout=30)
@@ -133,8 +136,6 @@ def main1(args):
         **kwargs
     )
 
-    args.num_classes = get_dataset_config(args.dataset)[0]
-    _, args.arch_name = build_model(args)
     executor.update_parameters(name=args.arch_name)
 
     args.dist_url = get_init_file(root='dist_init_files').as_uri()
