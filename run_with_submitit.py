@@ -15,6 +15,7 @@ from opts import arg_parser
 # from classifier.config import ClassifierConfig
 import submitit
 import torch.multiprocessing as mp
+from utils.dataset_config import get_dataset_config
 
 
 def parse_args(get_defaults=False):
@@ -132,6 +133,7 @@ def main1(args):
         **kwargs
     )
 
+    args.num_classes = get_dataset_config(args.dataset)[0]
     _, args.arch_name = build_model(args)
     executor.update_parameters(name=args.arch_name)
 
