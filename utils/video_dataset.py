@@ -292,15 +292,15 @@ class VideoDataSet(data.Dataset):
     def get_label(self, record):
         if self.test_mode:
             # in test mode, return the video id as label
-            label = record.video_id
+            label = int(record.video_id)
         else:
-            if not self.multi_label:
-                label = int(record.label)
-            else:
-                # create a binary vector.
-                label = torch.zeros(self.num_classes, dtype=torch.float)
-                for x in record.label:
-                    label[int(x)] = 1.0
+            # if not self.multi_label:
+            label = int(record.label)
+            # else:
+            #     # create a binary vector.
+            #     label = torch.zeros(self.num_classes, dtype=torch.float)
+            #     for x in record.label:
+            #         label[int(x)] = 1.0
         return label
     
     # def __getitem__(self, index):
