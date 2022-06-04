@@ -281,27 +281,44 @@ class VideoDataSet(data.Dataset):
         """
         record = self.video_list[index]
         # check this is a legit video folder
-        if self.is_train:
-            indices = self._sample_indices(record)
-        else:
-            indices = self._get_val_indices(record)
-
-        images = []
-        for seg_ind in indices:
-            for i in range(self.num_consecutive_frames):
-                new_seg_ind = min(seg_ind + record.start_frame - 1 + i, record.num_frames)
-                seg_imgs = self._load_image(record.path, new_seg_ind)
-                images.extend(seg_imgs)
-
+        indices = self._sample_indices(record) if self.is_train else self._get_val_indices(record)
+        images = self.get_data(record, indices)
         images = self.transform(images)
-        if self.test_mode:
-            # in test mode, return the video id as label
-            label = int(record.video_id)
-        else:
-            label = int(record.label)
+        label = self.get_label(record)
 
         # re-order data to targeted format.
         return images, label
+
+    
+    # def __getitem__(self, index):
+    #     """
+    #     Returns:
+    #         torch.FloatTensor: (3xgxf)xHxW dimension, g is number of groups and f is the frames per group.
+    #         torch.FloatTensor: the label
+    #     """
+    #     record = self.video_list[index]
+    #     # check this is a legit video folder
+    #     if self.is_train:
+    #         indices = self._sample_indices(record)
+    #     else:
+    #         indices = self._get_val_indices(record)
+
+    #     images = []
+    #     for seg_ind in indices:
+    #         for i in range(self.num_consecutive_frames):
+    #             new_seg_ind = min(seg_ind + record.start_frame - 1 + i, record.num_frames)
+    #             seg_imgs = self._load_image(record.path, new_seg_ind)
+    #             images.extend(seg_imgs)
+
+    #     images = self.transform(images)
+    #     if self.test_mode:
+    #         # in test mode, return the video id as label
+    #         label = int(record.video_id)
+    #     else:
+    #         label = int(record.label)
+
+    #     # re-order data to targeted format.
+    #     return images, label
 
     def __len__(self):
         return len(self.video_list)
