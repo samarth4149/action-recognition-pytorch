@@ -12,7 +12,6 @@ from models.model_builder import build_model
 from train import main_worker
 from opts import arg_parser
 # from classifier.config import ClassifierConfig
-from utils import ioutils
 import submitit
 import torch.multiprocessing as mp
 
