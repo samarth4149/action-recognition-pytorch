@@ -17,6 +17,7 @@ import torch
 import submitit
 import torch.multiprocessing as mp
 from utils.dataset_config import get_dataset_config
+import copy
 
 
 def parse_args(get_defaults=False):
@@ -52,6 +53,7 @@ def get_init_file(root):
 class Trainer(object):
     def __init__(self, args):
         self.args = args
+        self.orig_args = copy.deepcopy(args)
 
     def __call__(self):
         self._setup_gpu_args()
@@ -71,6 +73,7 @@ class Trainer(object):
     def checkpoint(self):
         import os
         import submitit
+        self.args = copy.deepcopy(self.orig_args)
 
         self.args.dist_url = get_init_file(root='dist_init_files').as_uri()
         # _, arch_name = build_model(self.args)

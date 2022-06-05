@@ -1,7 +1,9 @@
 from run_with_submitit import main1, parse_args
+from models.model_builder import build_model
+import os
 
-if __name__ == '__main__':
-    args = parse_args()
+def set_common():
+    args = parse_args(get_defaults=True)
     args.ngpus = 8
     args.nodes = 1
     args.datadir = '/gpfs/u/home/DPLD/DPLDsmms/scratch-shared/datasets/something2something-v2' 
@@ -14,6 +16,11 @@ if __name__ == '__main__':
     args.epochs = 100
     args.depth = 50
     args.imagenet_pretrained = False
+    return args
+
+if __name__ == '__main__':
+    args = parse_args()
+    
     
     run_idx = 0
     for wd in [0.0005, 0.001, 0.0001]:
@@ -22,8 +29,17 @@ if __name__ == '__main__':
                 if run_idx == 0:
                     run_idx += 1
                     continue
+                
+                args = set_common()
                 args.weight_decay = wd
                 args.lr = lr
                 args.batch_size = bs
+                
+                _, arch_name = build_model(args)
+                ckpt_file = os.path.join(args.logdir, arch_name, 'checkpoint.pth.tar')
+                if os.path.exists(ckpt_file):
+                    print(f'Resuming from {ckpt_file}')
+                    args.resume = ckpt_file
+                
                 main1(args)
                 run_idx += 1
