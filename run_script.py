@@ -2,6 +2,8 @@ from run_with_submitit import main1, parse_args
 from models.model_builder import build_model
 import os
 
+from utils.dataset_config import get_dataset_config
+
 def set_common():
     args = parse_args(get_defaults=True)
     args.ngpus = 8
@@ -35,6 +37,7 @@ if __name__ == '__main__':
                 args.lr = lr
                 args.batch_size = bs
                 
+                args.num_classes = get_dataset_config(args.dataset)[0]
                 _, arch_name = build_model(args)
                 ckpt_file = os.path.join(args.logdir, arch_name, 'checkpoint.pth.tar')
                 if os.path.exists(ckpt_file):
