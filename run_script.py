@@ -8,7 +8,7 @@ if __name__ == '__main__':
     args.dataset = 'mini_st2stv2' 
     args.frames_per_group = 1 
     args.groups = 8 
-    args.logdir = 'snapshots_somethingsomething_sweep/' 
+    args.logdir = 'snapshots_somethingsomething_sweep/tsn' 
     args.backbone_net = 'resnet'
     args.workers = 64
     args.epochs = 100

@@ -28,6 +28,5 @@ def build_model(args, test_mode=False):
 
     # add setting info only in training
     if not test_mode:
-        arch_name += "-{}{}-bs{}-e{}".format(args.lr_scheduler, "-syncbn" if args.sync_bn else "",
-                                             args.batch_size, args.epochs)
+        arch_name += "-bs{}-lr{:.0e}-wd{:.0e}".format(args.batch_size, args.lr, args.weight_decay)
     return model, arch_name
