@@ -19,7 +19,7 @@ def init_distributed_mode(args):
         args.rank = 0
         return
 
-    args.distributed = True
+    args.distributed = args.world_size > 1 or args.multiprocessing_distributed
 
     print('Setting cuda device:{:d}'.format(args.gpu))
     torch.cuda.set_device(args.gpu)
