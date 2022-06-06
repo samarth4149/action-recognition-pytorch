@@ -90,6 +90,9 @@ def main():
     if args.pretrained is not None:
         print("=> using pre-trained model '{}'".format(arch_name))
         checkpoint = torch.load(args.pretrained, map_location='cpu')
+        model_state_dict = model.state_dict()
+        for key in model_state_dict.keys():
+            model_state_dict[key] = checkpoint['state_dict']['module.' + key]
         model.load_state_dict(checkpoint['state_dict'])
     else:
         print("=> creating model '{}'".format(arch_name))
