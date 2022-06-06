@@ -13,7 +13,7 @@ from tqdm import tqdm
 from models import build_model
 from utils.utils import build_dataflow, AverageMeter, accuracy
 from utils.video_transforms import *
-from utils.video_dataset import VideoDataSet
+from utils.video_dataset import VideoDataSet, VideoDataSetOnline
 from utils.dataset_config import get_dataset_config
 from opts import arg_parser
 
@@ -128,7 +128,7 @@ def main():
     print("Number of crops: {}".format(args.num_crops))
     print("Number of clips: {}".format(args.num_clips))
 
-    val_dataset = VideoDataSet(args.datadir, data_list, args.groups, args.frames_per_group,
+    val_dataset = VideoDataSetOnline(args.datadir, data_list, args.groups, args.frames_per_group,
                                  num_clips=args.num_clips, modality=args.modality,
                                  image_tmpl=image_tmpl, dense_sampling=args.dense_sampling,
                                  fixed_offset=not args.random_sampling,
