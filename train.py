@@ -81,6 +81,18 @@ def main_worker(gpu, ngpus_per_node, args):
     model, arch_name = build_model(args)
     mean = model.mean(args.modality)
     std = model.std(args.modality)
+    
+    if args.lin_probe:
+        pre_params = []
+        for param in model.parameters():
+            pre_params.append(param)
+            if param.requires_grad:
+                #print("!!training tensor found", param)
+                param.requires_grad = False
+                #param.grad = None
+        # print('pre', pre_params[1])      
+        model.fc.weight.requires_grad = True
+        model.fc.bias.requires_grad = True
 
     # overwrite mean and std if they are presented in command
     if args.mean is not None:
@@ -152,7 +164,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # assign rank to 0
         model = torch.nn.DataParallel(model).cuda()
         args.rank = 0
-
+    
     # define loss function (criterion) and optimizer
     train_criterion = nn.CrossEntropyLoss().cuda(args.gpu)
     val_criterion = nn.CrossEntropyLoss().cuda(args.gpu)

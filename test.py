@@ -17,6 +17,8 @@ from utils.video_dataset import VideoDataSet
 from utils.dataset_config import get_dataset_config
 from opts import arg_parser
 
+from sklearn.metrics import confusion_matrix
+
 
 def eval_a_batch(data, model, num_clips=1, num_crops=1, threed_data=False):
     with torch.no_grad():
@@ -154,11 +156,13 @@ def main():
     # switch to evaluate mode
     model.eval()
     total_batches = len(data_loader)
+    all_labels = []
     with torch.no_grad(), tqdm(total=total_batches) as t_bar:
         end = time.time()
         for i, (video, label) in enumerate(data_loader):
             output = eval_a_batch(video, model, num_clips=args.num_clips, num_crops=args.num_crops,
                                   threed_data=args.threed_data)
+            all_labels.append(label)
             if args.evaluate:
                 label = label.cuda(non_blocking=True)
                 # measure accuracy
@@ -189,6 +193,10 @@ def main():
         np.save(os.path.join(log_folder, '{}_{}crops_{}clips_{}_details.npy'.format(
             "val" if args.evaluate else "test", args.num_crops,
             args.num_clips, args.input_size)), outputs)
+        
+        all_labels = torch.cat(all_labels).numpy()
+        conf_mat = confusion_matrix(all_labels, outputs.argmax(axis=1))
+        np.save(os.path.join(log_folder, 'conf_mat.npy'), conf_mat)
 
     if args.evaluate:
         print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
