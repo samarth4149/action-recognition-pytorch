@@ -131,7 +131,8 @@ def main():
     print("Number of crops: {}".format(args.num_crops))
     print("Number of clips: {}".format(args.num_clips))
 
-    val_dataset = VideoDataSetOnline(args.datadir, data_list, args.groups, args.frames_per_group,
+    dataset_class = VideoDataSet if args.use_frames else VideoDataSetOnline
+    val_dataset = dataset_class(args.datadir, data_list, args.groups, args.frames_per_group,
                                  num_clips=args.num_clips, modality=args.modality,
                                  image_tmpl=image_tmpl, dense_sampling=args.dense_sampling,
                                  fixed_offset=not args.random_sampling,

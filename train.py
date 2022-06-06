@@ -178,6 +178,8 @@ def main_worker(gpu, ngpus_per_node, args):
     val_criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
     # Data loading code
+    dataset_class = VideoDataSet if args.use_frames else VideoDataSetOnline
+    
     val_list = os.path.join(args.datadir, val_list_name)
 
     val_augmentor = get_augmentor(False, args.input_size, scale_range=args.scale_range, mean=mean,
@@ -186,7 +188,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                   is_flow=True if args.modality == 'flow' else False,
                                   version=args.augmentor_ver)
 
-    val_dataset = VideoDataSetOnline(args.datadir, val_list, args.groups, args.frames_per_group,
+    val_dataset = dataset_class(args.datadir, val_list, args.groups, args.frames_per_group,
                                      num_clips=args.num_clips,
                                      modality=args.modality, image_tmpl=image_tmpl,
                                      dense_sampling=args.dense_sampling,
@@ -227,7 +229,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                     is_flow=True if args.modality == 'flow' else False,
                                     version=args.augmentor_ver)
 
-    train_dataset = VideoDataSetOnline(args.datadir, train_list, args.groups, args.frames_per_group,
+    train_dataset = dataset_class(args.datadir, train_list, args.groups, args.frames_per_group,
                                        num_clips=args.num_clips,
                                        modality=args.modality, image_tmpl=image_tmpl,
                                        dense_sampling=args.dense_sampling,

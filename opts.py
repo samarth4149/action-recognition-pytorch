@@ -128,5 +128,6 @@ def arg_parser():
     
     parser.add_argument('--lin_probe', action='store_true', default=False)
     parser.add_argument('--eval_on_train', action='store_true', default=False)
+    parser.add_argument('--use_frames', action='store_true', default=False)
 
     return parser
