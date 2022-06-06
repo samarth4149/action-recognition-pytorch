@@ -289,6 +289,16 @@ class VideoDataSet(data.Dataset):
         # re-order data to targeted format.
         return images, label
 
+    def get_data(self, record, indices):
+        images = []
+        for seg_ind in indices:
+            for i in range(self.num_consecutive_frames):
+                new_seg_ind = min(seg_ind + record.start_frame - 1 + i, record.num_frames)
+                seg_imgs = self._load_image(record.path, new_seg_ind)
+                images.extend(seg_imgs)
+
+        return images
+    
     def get_label(self, record):
         if self.test_mode:
             # in test mode, return the video id as label
