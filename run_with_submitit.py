@@ -62,7 +62,9 @@ class Trainer(object):
     def checkpoint(self):
         import os
         import submitit
-        self.args = copy.deepcopy(self.orig_args)
+        self.args = parse_args(get_defaults=True)
+        for arg in vars(self.orig_args):
+            self.args.__dict__[arg] = self.orig_args.__dict__[arg]
 
         self.args.dist_url = get_init_file(root='dist_init_files').as_uri()
         # _, arch_name = build_model(self.args)
