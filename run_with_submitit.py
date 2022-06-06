@@ -57,18 +57,7 @@ class Trainer(object):
 
     def __call__(self):
         self._setup_gpu_args()
-        self.args.distributed = self.args.world_size > 1 or self.args.multiprocessing_distributed
-        ngpus_per_node = torch.cuda.device_count()
-        if self.args.multiprocessing_distributed:
-            # Since we have ngpus_per_node processes per node, the total world_size
-            # needs to be adjusted accordingly
-            self.args.world_size = ngpus_per_node * self.args.world_size
-            # Use torch.multiprocessing.spawn to launch distributed processes: the
-            # main_worker process function
-            mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, self.args))
-        else:
-            # Simply call main_worker function
-            main_worker(self.args.gpu, ngpus_per_node, self.args)
+        main_worker(self.args.gpu, self.args.ngpus, self.args)
 
     def checkpoint(self):
         import os

@@ -22,6 +22,8 @@ from utils.utils import (train, validate, build_dataflow, get_augmentor,
 from utils.video_dataset import VideoDataSet
 from utils.video_dataset import VideoDataSetOnline
 from utils.dataset_config import get_dataset_config
+from utils.fix_infiniband import fix_infiniband
+from utils.distributed import init_distributed_mode
 from opts import arg_parser
 
 try:
@@ -54,6 +56,12 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     cudnn.benchmark = args.cudnn_benchmark
+    
+    num_hosts = len(os.environ.get('LSB_MCPU_HOSTS', 'localhost cpus').split()) // 2
+    if num_hosts > 1:
+        fix_infiniband()
+    
+    init_distributed_mode(args)
     args.gpu = gpu
 
     num_classes, train_list_name, val_list_name, test_list_name, filename_seperator, image_tmpl, filter_video, label_file = get_dataset_config(
