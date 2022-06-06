@@ -154,10 +154,10 @@ def main():
     logfile = open(os.path.join(log_folder, 'evaluate_log.log'), 'a')
     
     print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
-        args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+        args.input_size, scale_size, args.num_crops, args.num_clips, top1, top5),
         flush=True)
     print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
-        args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+        args.input_size, scale_size, args.num_crops, args.num_clips, top1, top5),
         flush=True, file=logfile)
     
     conf_mat = confusion_matrix(all_labels, all_preds)
