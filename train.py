@@ -133,7 +133,7 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.rank == 0:
             print("=> using pre-trained model '{}'".format(arch_name))
         checkpoint = torch.load(args.pretrained, map_location='cpu')
-        model.load_state_dict(checkpoint['state_dict'], strict=False)
+        model.load_state_dict(checkpoint['state_dict'], strict=True)
         del checkpoint  # dereference seems crucial
         torch.cuda.empty_cache()
     else:
