@@ -208,15 +208,16 @@ class I3D_ResNet(nn.Module):
         return logits
 
 
-def i3d_resnet(depth, num_classes, dropout, without_t_stride, **kwargs):
+def i3d_resnet(depth, num_classes, dropout, without_t_stride, imagenet_pretrained=True, **kwargs):
     model = I3D_ResNet(depth, num_classes=num_classes, dropout=dropout, without_t_stride=without_t_stride)
 
-    new_model_state_dict = model.state_dict()
-    state_dict = model_zoo.load_url(model_urls['resnet{}'.format(depth)],
-                                    map_location='cpu', progress=True)
-    state_d = inflate_from_2d_model(state_dict, new_model_state_dict,
-                                    skipped_keys=['fc'])
-    model.load_state_dict(state_d, strict=False)
+    if imagenet_pretrained:
+        new_model_state_dict = model.state_dict()
+        state_dict = model_zoo.load_url(model_urls['resnet{}'.format(depth)],
+                                        map_location='cpu', progress=True)
+        state_d = inflate_from_2d_model(state_dict, new_model_state_dict,
+                                        skipped_keys=['fc'])
+        model.load_state_dict(state_d, strict=False)
     return model
 
 
