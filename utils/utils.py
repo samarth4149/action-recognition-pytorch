@@ -261,7 +261,7 @@ def validate1(data_loader, model, criterion, gpu_id=None):
             end = time.time()
             t_bar.update(1)
 
-    all_preds = torch.cat(all_preds, dim=0)
-    all_labels = torch.cat(all_labels, dim=0)
+    all_preds = torch.cat(all_preds, dim=0).numpy()
+    all_labels = torch.cat(all_labels, dim=0).numpy()
 
     return top1.avg, top5.avg, losses.avg, batch_time.avg, all_preds, all_labels
