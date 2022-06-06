@@ -135,7 +135,7 @@ def main():
                                  num_clips=args.num_clips, modality=args.modality,
                                  image_tmpl=image_tmpl, dense_sampling=args.dense_sampling,
                                  fixed_offset=not args.random_sampling,
-                                 transform=augmentor, is_train=False, test_mode=not args.evaluate,
+                                 transform=augmentor, is_train=args.eval_on_train, test_mode=not args.evaluate,
                                  seperator=filename_seperator, filter_video=filter_video)
 
     data_loader = build_dataflow(val_dataset, is_train=False, batch_size=args.batch_size,
