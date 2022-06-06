@@ -55,12 +55,13 @@ DATASET_CONFIG = {
     },
     'hmdb51': {
         'num_classes': 51,
-        'train_list_name': 'annotations/hmdb51_train_split_1_videos.txt',
-        'val_list_name': 'annotations/hmdb51_val_split_1_videos.txt',
-        'filename_seperator': " ",
+        'train_list_name': 'hmdb_train.txt',
+        'val_list_name': 'hmdb_val.txt',
+        'test_list_name': 'test.txt',
+        'filename_seperator': ";;",
         'image_tmpl': '{:05d}.jpg',
         'filter_video': 0
-    }
+    },
 }
 
 
