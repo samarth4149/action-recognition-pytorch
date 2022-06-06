@@ -19,6 +19,7 @@ from opts import arg_parser
 
 from sklearn.metrics import confusion_matrix
 
+from utils.utils import validate1
 
 def eval_a_batch(data, model, num_clips=1, num_crops=1, threed_data=False):
     with torch.no_grad():
@@ -142,73 +143,89 @@ def main():
     data_loader = build_dataflow(val_dataset, is_train=False, batch_size=args.batch_size,
                                  workers=args.workers)
 
+    criterion = nn.CrossEntropyLoss().cuda(args.gpu)
+    model.eval()
+    
+    top1, top5, loss, batch_time, all_preds, all_labels = validate1(data_loader, model, criterion) 
+
     log_folder = os.path.join(args.logdir, arch_name)
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
+    logfile = open(os.path.join(log_folder, 'evaluate_log.log'), 'a')
+    
+    print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
+        args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+        flush=True)
+    print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
+        args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+        flush=True, file=logfile)
+    
+    conf_mat = confusion_matrix(all_labels, all_preds)
+    np.save(os.path.join(log_folder, 'conf_mat.npy'), conf_mat)
 
-    batch_time = AverageMeter()
-    if args.evaluate:
-        logfile = open(os.path.join(log_folder, 'evaluate_log.log'), 'a')
-        top1 = AverageMeter()
-        top5 = AverageMeter()
-    else:
-        logfile = open(os.path.join(log_folder, 'test_{}crops_{}clips_{}.csv'.format(
-            args.num_crops, args.num_clips, args.input_size)), 'w')
+    # batch_time = AverageMeter()
+    # if args.evaluate:
+    #     logfile = open(os.path.join(log_folder, 'evaluate_log.log'), 'a')
+    #     top1 = AverageMeter()
+    #     top5 = AverageMeter()
+    # else:
+    #     logfile = open(os.path.join(log_folder, 'test_{}crops_{}clips_{}.csv'.format(
+    #         args.num_crops, args.num_clips, args.input_size)), 'w')
 
-    total_outputs = 0
-    outputs = np.zeros((len(data_loader) * args.batch_size, num_classes))
-    # switch to evaluate mode
-    model.eval()
-    total_batches = len(data_loader)
-    all_labels = []
-    with torch.no_grad(), tqdm(total=total_batches) as t_bar:
-        end = time.time()
-        for i, (video, label) in enumerate(data_loader):
-            output = eval_a_batch(video, model, num_clips=args.num_clips, num_crops=args.num_crops,
-                                  threed_data=args.threed_data)
-            all_labels.append(label)
-            if args.evaluate:
-                label = label.cuda(non_blocking=True)
-                # measure accuracy
-                prec1, prec5 = accuracy(output, label, topk=(1, 5))
-                top1.update(prec1[0], video.size(0))
-                top5.update(prec5[0], video.size(0))
-                output = output.data.cpu().numpy().copy()
-                batch_size = output.shape[0]
-                outputs[total_outputs:total_outputs + batch_size, :] = output
-            else:
-                # testing, store output to prepare csv file
-                output = output.data.cpu().numpy().copy()
-                batch_size = output.shape[0]
-                outputs[total_outputs:total_outputs + batch_size, :] = output
-                predictions = np.argsort(output, axis=1)
-                for ii in range(len(predictions)):
-                    # preds = [id_to_label[str(pred)] for pred in predictions[ii][::-1][:5]]
-                    temp = predictions[ii][::-1][:5]
-                    preds = [str(pred) for pred in temp]
-                    print("{};{}".format(label[ii], ";".join(preds)), file=logfile)
-            total_outputs += video.shape[0]
-            batch_time.update(time.time() - end)
-            end = time.time()
-            t_bar.update(1)
+    # total_outputs = 0
+    # outputs = np.zeros((len(data_loader) * args.batch_size, num_classes))
+    # # switch to evaluate mode
+    # model.eval()
+    # total_batches = len(data_loader)
+    # all_labels = []
+    # with torch.no_grad(), tqdm(total=total_batches) as t_bar:
+    #     end = time.time()
+    #     for i, (video, label) in enumerate(data_loader):
+    #         output = eval_a_batch(video, model, num_clips=args.num_clips, num_crops=args.num_crops,
+    #                               threed_data=args.threed_data)
+    #         all_labels.append(label)
+    #         if args.evaluate:
+    #             label = label.cuda(non_blocking=True)
+    #             # measure accuracy
+    #             prec1, prec5 = accuracy(output, label, topk=(1, 5))
+    #             top1.update(prec1[0], video.size(0))
+    #             top5.update(prec5[0], video.size(0))
+    #             output = output.data.cpu().numpy().copy()
+    #             batch_size = output.shape[0]
+    #             outputs[total_outputs:total_outputs + batch_size, :] = output
+    #         else:
+    #             # testing, store output to prepare csv file
+    #             output = output.data.cpu().numpy().copy()
+    #             batch_size = output.shape[0]
+    #             outputs[total_outputs:total_outputs + batch_size, :] = output
+    #             predictions = np.argsort(output, axis=1)
+    #             for ii in range(len(predictions)):
+    #                 # preds = [id_to_label[str(pred)] for pred in predictions[ii][::-1][:5]]
+    #                 temp = predictions[ii][::-1][:5]
+    #                 preds = [str(pred) for pred in temp]
+    #                 print("{};{}".format(label[ii], ";".join(preds)), file=logfile)
+    #         total_outputs += video.shape[0]
+    #         batch_time.update(time.time() - end)
+    #         end = time.time()
+    #         t_bar.update(1)
 
-        outputs = outputs[:total_outputs]
-        print("Predict {} videos.".format(total_outputs), flush=True)
-        np.save(os.path.join(log_folder, '{}_{}crops_{}clips_{}_details.npy'.format(
-            "val" if args.evaluate else "test", args.num_crops,
-            args.num_clips, args.input_size)), outputs)
+    #     outputs = outputs[:total_outputs]
+    #     print("Predict {} videos.".format(total_outputs), flush=True)
+    #     np.save(os.path.join(log_folder, '{}_{}crops_{}clips_{}_details.npy'.format(
+    #         "val" if args.evaluate else "test", args.num_crops,
+    #         args.num_clips, args.input_size)), outputs)
         
-        all_labels = torch.cat(all_labels).numpy()
-        conf_mat = confusion_matrix(all_labels, outputs.argmax(axis=1))
-        np.save(os.path.join(log_folder, 'conf_mat.npy'), conf_mat)
+    #     all_labels = torch.cat(all_labels).numpy()
+    #     conf_mat = confusion_matrix(all_labels, outputs.argmax(axis=1))
+    #     np.save(os.path.join(log_folder, 'conf_mat.npy'), conf_mat)
 
-    if args.evaluate:
-        print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
-            args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
-            flush=True)
-        print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
-            args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
-            flush=True, file=logfile)
+    # if args.evaluate:
+    #     print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
+    #         args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+    #         flush=True)
+    #     print('Val@{}({}) (# crops = {}, # clips = {}): \tTop@1: {:.4f}\tTop@5: {:.4f}'.format(
+    #         args.input_size, scale_size, args.num_crops, args.num_clips, top1.avg, top5.avg),
+    #         flush=True, file=logfile)
 
     logfile.close()
 

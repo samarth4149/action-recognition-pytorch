@@ -218,3 +218,50 @@ def validate(data_loader, model, criterion, gpu_id=None):
             t_bar.update(1)
 
     return top1.avg, top5.avg, losses.avg, batch_time.avg
+
+def validate1(data_loader, model, criterion, gpu_id=None):
+    batch_time = AverageMeter()
+    losses = AverageMeter()
+    top1 = AverageMeter()
+    top5 = AverageMeter()
+    all_preds = []
+    all_labels = []
+
+    # switch to evaluate mode
+    model.eval()
+
+    with torch.no_grad(), tqdm(total=len(data_loader)) as t_bar:
+        end = time.time()
+        for i, (images, target) in enumerate(data_loader):
+
+            if gpu_id is not None:
+                images = images.cuda(gpu_id, non_blocking=True)
+            target = target.cuda(gpu_id, non_blocking=True)
+
+            # compute output
+            output = model(images)
+            loss = criterion(output, target)
+            all_preds.append(output.argmax(dim=1).cpu())
+            all_labels.append(target.cpu())
+
+            # measure accuracy and record loss
+            prec1, prec5 = accuracy(output, target)
+            if dist.is_initialized():
+                world_size = dist.get_world_size()
+                dist.all_reduce(prec1)
+                dist.all_reduce(prec5)
+                prec1 /= world_size
+                prec5 /= world_size
+            losses.update(loss.item(), images.size(0))
+            top1.update(prec1[0], images.size(0))
+            top5.update(prec5[0], images.size(0))
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+            t_bar.update(1)
+
+    all_preds = torch.cat(all_preds, dim=0)
+    all_labels = torch.cat(all_labels, dim=0)
+
+    return top1.avg, top5.avg, losses.avg, batch_time.avg, all_preds, all_labels
