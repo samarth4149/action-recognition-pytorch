@@ -6,8 +6,8 @@ from utils.dataset_config import get_dataset_config
 
 def set_common():
     args = parse_args(get_defaults=True)
-    args.ngpus = 8
-    args.nodes = 1
+    args.ngpus = 4
+    args.nodes = 2
     args.datadir = '/gpfs/u/home/DPLD/DPLDsmms/scratch-shared/datasets/something2something-v2' 
     args.dataset = 'mini_st2stv2' 
     args.frames_per_group = 1 
