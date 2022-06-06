@@ -93,7 +93,7 @@ def main():
         model_state_dict = model.state_dict()
         for key in model_state_dict.keys():
             model_state_dict[key] = checkpoint['state_dict']['module.' + key]
-        model.load_state_dict(checkpoint['state_dict'])
+        model.load_state_dict(model_state_dict)
     else:
         print("=> creating model '{}'".format(arch_name))
 
