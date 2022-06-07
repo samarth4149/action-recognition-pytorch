@@ -10,7 +10,7 @@ if __name__ == '__main__':
     rep_biases = []
     for i in range(1, 11):
         curr_acc = torch.load(f'snapshots_hmdb51_cls_split/tsn/split_{i}/hmdb51_cls_split_1-rgb-resnet-50-ts-max-f8-bs32-lr1e-03-wd5e-04/model_best.pth.tar')['best_top1']
-        rep_biases.append(np.log((curr_acc.item() * DATASET_CONFIG[f'hmdb51_cls_split_{i}'])/100.))
+        rep_biases.append(np.log((curr_acc.item() * DATASET_CONFIG[f'hmdb51_cls_split_{i}']['num_classes'])/100.))
     fig, ax = plt.subplots()
     ax.plot(np.arange(21, 51, 3), rep_biases[::-1])
     ax.set_xlabel('Num classes')
