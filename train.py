@@ -135,6 +135,8 @@ def main_worker(gpu, ngpus_per_node, args):
         checkpoint = torch.load(args.pretrained, map_location='cpu')
         model_state_dict = model.state_dict()
         for key in model_state_dict.keys():
+            if args.load_only_backbone and key.startswith('fc.'):
+                continue
             model_state_dict[key] = checkpoint['state_dict']['module.' + key]
         model.load_state_dict(model_state_dict)
         # model.load_state_dict(checkpoint['state_dict'], strict=True)
