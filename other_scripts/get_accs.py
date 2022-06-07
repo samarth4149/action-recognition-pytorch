@@ -11,7 +11,7 @@ if __name__ == '__main__':
     
     accs = []
     for i in range(1, 11):
-        model_path = next(Path(args.snapshot_dir / f'split_{i}').glob('*')) / 'model_best.pth.tar'
+        model_path = next((Path(args.snapshot_dir) / f'split_{i}').glob('*')) / 'model_best.pth.tar'
         curr_model = torch.load(model_path)
         accs.append(curr_model['best_top1'])
         
