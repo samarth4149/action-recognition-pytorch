@@ -13,6 +13,6 @@ if __name__ == '__main__':
     for i in range(1, 11):
         model_path = next((Path(args.snapshot_dir) / f'split_{i}').glob('*')) / 'model_best.pth.tar'
         curr_model = torch.load(model_path)
-        accs.append(curr_model['best_top1'])
+        accs.append(curr_model['best_top1'].item())
         
     print(accs[::-1])
