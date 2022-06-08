@@ -151,6 +151,96 @@ DATASET_CONFIG = {
         "filename_seperator": ";;",
         "image_tmpl": "{:05d}.jpg",
         "filter_video": 0
+    },
+    "hmdb51_25cls_split_1": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_1.txt",
+        "val_list_name": "hmdb_val_25cls_split_1.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_2": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_2.txt",
+        "val_list_name": "hmdb_val_25cls_split_2.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_3": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_3.txt",
+        "val_list_name": "hmdb_val_25cls_split_3.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_4": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_4.txt",
+        "val_list_name": "hmdb_val_25cls_split_4.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_5": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_5.txt",
+        "val_list_name": "hmdb_val_25cls_split_5.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_6": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_6.txt",
+        "val_list_name": "hmdb_val_25cls_split_6.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_7": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_7.txt",
+        "val_list_name": "hmdb_val_25cls_split_7.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_8": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_8.txt",
+        "val_list_name": "hmdb_val_25cls_split_8.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_9": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_9.txt",
+        "val_list_name": "hmdb_val_25cls_split_9.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "hmdb51_25cls_split_10": {
+        "num_classes": 25,
+        "train_list_name": "hmdb_train_25cls_split_10.txt",
+        "val_list_name": "hmdb_val_25cls_split_10.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": ";;",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
     }
 }
 
