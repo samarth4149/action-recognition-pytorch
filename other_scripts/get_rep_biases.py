@@ -3,7 +3,6 @@ import sys
 sys.path.append(os.path.abspath('.'))
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 from utils.dataset_config import DATASET_CONFIG
 from pathlib import Path
 
