@@ -5,11 +5,13 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from utils.dataset_config import DATASET_CONFIG
+from pathlib import Path
 
 if __name__ == '__main__':
     rep_biases = []
     for i in range(1, 11):
-        curr_acc = torch.load(f'snapshots_hmdb51_cls_split/tsn/split_{i}/hmdb51_cls_split_{i}-rgb-resnet-50-ts-max-f8-bs32-lr1e-03-wd5e-04/model_best.pth.tar')['best_top1']
+        file_path = next(Path(f'snapshots_hmdb51_25cls_split/tsn/split_{i}').glob('*')) / 'model_best.pth.tar'
+        curr_acc = torch.load(file_path)['best_top1']
         rep_biases.append(np.log2((curr_acc.item() * DATASET_CONFIG[f'hmdb51_cls_split_{i}']['num_classes'])/100.))
     print(rep_biases[::-1])
     # fig, ax = plt.subplots()
