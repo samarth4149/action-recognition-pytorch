@@ -1,3 +1,4 @@
+from cProfile import run
 import os
 import sys
 sys.path.append(os.path.abspath('.'))
@@ -31,6 +32,9 @@ if __name__ == '__main__':
     for wd in [0.0005, 0.001, 0.0001]:
         for bs in [64, 32]:
             for lr in [0.0001, 0.0005, 0.001]:
+                if run_idx == 0:
+                    run_idx += 1
+                    continue
                 args = set_common()
                 args.weight_decay = wd
                 args.lr = lr
@@ -42,3 +46,4 @@ if __name__ == '__main__':
                 ckpt = torch.load(ckpt_file)
                 acc = ckpt['best_top1']
                 print('{:.2f}'.format(acc))
+                run_idx += 1
