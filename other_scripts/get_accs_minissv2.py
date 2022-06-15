@@ -16,8 +16,8 @@ def set_common():
     args.dataset = 'mini_st2stv2' 
     args.frames_per_group = 1 
     args.groups = 8 
-    args.logdir = 'snapshots_somethingsomething_sweep/tsn_imagenet_pt' 
-    args.backbone_net = 'resnet'
+    args.logdir = 'snapshots_somethingsomething_sweep/i3d_resnet_imagenet_pt' 
+    args.backbone_net = 'i3d_resnet'
     args.workers = 64
     args.epochs = 100
     args.depth = 50
@@ -32,9 +32,9 @@ if __name__ == '__main__':
     for wd in [0.0005, 0.001, 0.0001]:
         for bs in [64, 32]:
             for lr in [0.0001, 0.0005, 0.001]:
-                if run_idx == 0:
-                    run_idx += 1
-                    continue
+                # if run_idx == 0:
+                #     run_idx += 1
+                #     continue
                 args = set_common()
                 args.weight_decay = wd
                 args.lr = lr
