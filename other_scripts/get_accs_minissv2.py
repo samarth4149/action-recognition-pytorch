@@ -44,5 +44,5 @@ if __name__ == '__main__':
                 _, arch_name = build_model(args)
                 ckpt_file = os.path.join(args.logdir, arch_name, 'model_best.pth.tar')
                 ckpt = torch.load(ckpt_file)
-                acc = ckpt['best_acc1']
+                acc = ckpt['best_top1']
                 print('{:.2f}'.format(acc))
