@@ -38,7 +38,7 @@ if __name__ == '__main__':
     }
     
     run_idx = 0
-    for dataset in ['diving48', 'ikea_furniture', 'uav_human']:
+    for dataset in ['ikea_furniture', 'uav_human']:
         data_dir = data_base / dataset if dataset != 'mini_st2stv2' else data_base / 'something2something-v2'
         for (bs, lr, wd) in hyperparams[dataset]:   
             args = set_common()
