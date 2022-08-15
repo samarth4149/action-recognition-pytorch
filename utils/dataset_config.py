@@ -55,8 +55,8 @@ DATASET_CONFIG = {
     },
     "hmdb51": {
         "num_classes": 51,
-        "train_list_name": "hmdb_train.txt",
-        "val_list_name": "hmdb_val.txt",
+        "train_list_name": "train.txt",
+        "val_list_name": "val.txt",
         "test_list_name": "test.txt",
         "filename_seperator": ";;",
         "image_tmpl": "{:05d}.jpg",
@@ -151,6 +151,15 @@ DATASET_CONFIG = {
         "filename_seperator": ";;",
         "image_tmpl": "{:05d}.jpg",
         "filter_video": 0
+    },
+    "ucf101": {
+        "num_classes": 101,
+        "train_list_name": "train.txt",
+        "val_list_name": "val.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": " ",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 3
     }
 }
 
