@@ -1,1 +1,3 @@
 __pycache__/
+create_splits/*
+hmdb_data/*

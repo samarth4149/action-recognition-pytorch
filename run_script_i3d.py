@@ -43,7 +43,7 @@ if __name__ == '__main__':
             args = set_common()
             args.datadir = data_dir
             args.dataset = dataset
-            args.log_dir = f'expts/i3d_resnet_moments_pt/{dataset}_lin_probe'
+            args.logdir = f'expts/i3d_resnet_moments_pt/{dataset}_lin_probe'
             args.weight_decay = wd
             args.lr = lr
             args.batch_size = bs
