@@ -184,7 +184,7 @@ DATASET_CONFIG = {
         "train_list_name": "train_random_frames.txt",
         "val_list_name": "val_random_frames.txt",
         "test_list_name": "test.txt",
-        "filename_seperator": " ",
+        "filename_seperator": ";",
         "image_tmpl": "{:05d}.jpg",
         "filter_video": 0
     }
