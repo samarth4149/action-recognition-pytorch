@@ -15,7 +15,7 @@ def set_common():
     args.frames_per_group = 1 
     args.groups = 8 
     # args.logdir = 'snapshots_somethingsomething_sweep/tsn' 
-    args.pretrained = '/gpfs/u/home/DPLD/DPLDsmms/scratch-shared/datasets/synapt/moments_models/i3d_moments_model_best.pth.tar'
+    args.pretrained = '/gpfs/u/home/DPLD/DPLDsmms/scratch-shared/datasets/synapt/moments_models/tsn_moments_model_best.pth.tar'
     args.lin_probe = True
     args.backbone_net = 'resnet'
     args.workers = 64
