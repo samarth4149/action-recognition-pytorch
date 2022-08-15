@@ -55,8 +55,8 @@ DATASET_CONFIG = {
     },
     "hmdb51": {
         "num_classes": 51,
-        "train_list_name": "train.txt",
-        "val_list_name": "val.txt",
+        "train_list_name": "train_random_frames.txt",
+        "val_list_name": "val_random_frames.txt",
         "test_list_name": "test.txt",
         "filename_seperator": " ",
         "image_tmpl": "{:05d}.jpg",
@@ -154,8 +154,8 @@ DATASET_CONFIG = {
     },
     "ucf101": {
         "num_classes": 101,
-        "train_list_name": "train.txt",
-        "val_list_name": "val.txt",
+        "train_list_name": "train_random_frames.txt",
+        "val_list_name": "val_random_frames.txt",
         "test_list_name": "test.txt",
         "filename_seperator": " ",
         "image_tmpl": "{:05d}.jpg",
