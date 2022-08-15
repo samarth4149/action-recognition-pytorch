@@ -160,6 +160,33 @@ DATASET_CONFIG = {
         "filename_seperator": " ",
         "image_tmpl": "{:05d}.jpg",
         "filter_video": 3
+    },
+    "diving48": {
+        "num_classes": 48,
+        "train_list_name": "train_random_frames.txt",
+        "val_list_name": "val_random_frames.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": " ",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "ikea_furniture": {
+        "num_classes": 12,
+        "train_list_name": "train_random_frames.txt",
+        "val_list_name": "val_random_frames.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": " ",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
+    },
+    "uav_human": {
+        "num_classes": 155,
+        "train_list_name": "train_random_frames.txt",
+        "val_list_name": "val_random_frames.txt",
+        "test_list_name": "test.txt",
+        "filename_seperator": " ",
+        "image_tmpl": "{:05d}.jpg",
+        "filter_video": 0
     }
 }
 
