@@ -37,7 +37,7 @@ if __name__ == '__main__':
         'mini_st2stv2': [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
     }
     
-    for dataset in ['mini_st2stv2', 'hmdb51', 'ucf101']:
+    for dataset in ['hmdb51']:
         data_dir = data_base / dataset if dataset != 'mini_st2stv2' else data_base / 'something2something-v2'
         for (bs, lr, wd) in hyperparams[dataset]:
             args = set_common()
