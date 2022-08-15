@@ -15,7 +15,6 @@ def set_common():
     args.groups = 8 
     # args.logdir = 'snapshots_somethingsomething_sweep/s3d_resnet' 
     args.pretrained = '/gpfs/u/home/DPLD/DPLDsmms/scratch-shared/datasets/synapt/moments_models/s3d_moments_model_best.pth.tar'
-    args.lin_probe = True
     args.backbone_net = 's3d_resnet'
     args.multiprocessing_distributed = True
     args.threed_data = True
@@ -33,16 +32,24 @@ if __name__ == '__main__':
         'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
         'hmdb51' : [(32, 0.001, 0.0001), (64, 0.001, 0.0001)],
         'mini_st2stv2': [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
+        'diving48' : [(32, 0.001, 0.001), (32, 0.001, 0.0001)],
+        'ikea_furniture' : [(64, 0.001, 0.0005), (32, 0.0005, 0.0005)],
+        'uav_human' : [(32, 0.001, 0.0005), (32, 0.001, 0.0001)],
     }
     
     run_idx = 0
-    for dataset in ['mini_st2stv2', 'hmdb51', 'ucf101']:
+    for dataset in ['diving48', 'ikea_furniture', 'uav_human']:
         data_dir = data_base / dataset if dataset != 'mini_st2stv2' else data_base / 'something2something-v2'
         for (bs, lr, wd) in hyperparams[dataset]: 
             args = set_common()
             args.datadir = data_dir
             args.dataset = dataset
-            args.logdir = f'expts/s3d_resnet_moments_pt/{dataset}_lin_probe'
+            if dataset in ['diving48', 'ikea_furniture', 'uav_human']:
+                args.lin_probe = False
+                args.logdir = f'expts/s3d_resnet_moments_pt/{dataset}_finetune'
+            else:
+                args.lin_probe = True
+                args.logdir = f'expts/s3d_resnet_moments_pt/{dataset}_lin_probe'
             args.weight_decay = wd
             args.lr = lr
             args.batch_size = bs
