@@ -34,12 +34,13 @@ if __name__ == '__main__':
         'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
         'hmdb51' : [(32, 0.001, 0.0001), (32, 0.0005, 0.0001)],
         'mini_st2stv2': [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
-        'diving48' : [(32, 0.001, 0.001), (32, 0.001, 0.0005)],
+        # 'diving48' : [(32, 0.001, 0.001), (32, 0.001, 0.0005)],
+        'diving48' : [(32, 0.01, 0.001)],
         'ikea_furniture' : [(64, 0.0005, 0.001), (32, 0.001, 0.0005)],
         'uav_human' : [(64, 0.001, 0.0001), (64, 0.0005, 0.0001)],
     }
     
-    for dataset in ['hmdb51']:
+    for dataset in ['diving48']:
         data_dir = data_base / dataset if dataset != 'mini_st2stv2' else data_base / 'something2something-v2'
         for (bs, lr, wd) in hyperparams[dataset]:
             args = set_common()
