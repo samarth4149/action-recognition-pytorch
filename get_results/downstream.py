@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.path.abspath('.'))
-from run_with_submitit import main1, parse_args
+from run_with_submitit import parse_args
 from models.model_builder import build_model
 
 from utils.dataset_config import get_dataset_config
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     
     run_idx = 0
     for model in ['tsn', 'i3d', 's3d']:
-        if args.model == 'tsn':
+        if model == 'tsn':
             args.backbone_net = 'resnet'
             hyperparams = {
                 'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                 'ikea_furniture' : [(32, 0.001, 0.001), (32, 0.0005, 0.0005)],
                 'uav_human' : [(32, 0.001, 0.001), (32, 0.001, 0.0001)],
             }
-        elif args.model == 'i3d':
+        elif model == 'i3d':
             args.backbone_net = 'i3d_resnet'
             hyperparams = {
                 'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
@@ -101,4 +101,4 @@ if __name__ == '__main__':
                 
                 run_idx += 1
                 
-            print(f'{model} {dataset} best acc : {best_acc:.2f}')
+            print(f'{model} {dataset} {"LP" if args.lin_probe else "FT"} best acc : {best_acc:.2f}')
