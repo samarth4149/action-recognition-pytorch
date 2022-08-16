@@ -1,6 +1,8 @@
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
 from run_with_submitit import main1, parse_args
 from models.model_builder import build_model
-import os
 
 from utils.dataset_config import get_dataset_config
 
