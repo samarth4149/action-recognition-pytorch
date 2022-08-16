@@ -55,8 +55,8 @@ DATASET_CONFIG = {
     },
     "hmdb51": {
         "num_classes": 51,
-        "train_list_name": "train_random_frames.txt",
-        "val_list_name": "val_random_frames.txt",
+        "train_list_name": "hmdb51_train_IBM_Repo.txt",
+        "val_list_name": "hmdb51_test_IBM_Repo.txt",
         "test_list_name": "test.txt",
         "filename_seperator": " ",
         "image_tmpl": "{:05d}.jpg",
