@@ -34,7 +34,7 @@ if __name__ == '__main__':
     run_idx = 0
     for model in ['tsn', 'i3d', 's3d']:
         if model == 'tsn':
-            args.backbone_net = 'resnet'
+            backbone_net = 'resnet'
             hyperparams = {
                 'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
                 'hmdb51' : [(32, 0.001, 0.0001), (64, 0.001, 0.0001)],
@@ -44,7 +44,7 @@ if __name__ == '__main__':
                 'uav_human' : [(32, 0.001, 0.001), (32, 0.001, 0.0001)],
             }
         elif model == 'i3d':
-            args.backbone_net = 'i3d_resnet'
+            backbone_net = 'i3d_resnet'
             hyperparams = {
                 'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
                 'hmdb51' : [(32, 0.001, 0.0001), (32, 0.0005, 0.0001)],
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 'uav_human' : [(64, 0.001, 0.0001), (64, 0.0005, 0.0001)],
             }
         else:
-            args.backbone_net = 's3d_resnet'
+            backbone_net = 's3d_resnet'
             hyperparams = {
                 'ucf101' : [(32, 0.001, 0.0001), (32, 0.001, 0.001)],
                 'hmdb51' : [(32, 0.001, 0.0001), (64, 0.001, 0.0001)],
@@ -69,14 +69,15 @@ if __name__ == '__main__':
             best_hps = None
             for (bs, lr, wd) in hyperparams[dataset]:   
                 args = set_common()
+                args.backbone_net = backbone_net
                 args.datadir = data_dir
                 args.dataset = dataset
                 if dataset in ['diving48', 'ikea_furniture', 'uav_human']:
                     args.lin_probe = False
-                    args.logdir = f'expts/tsn_resnet_moments_pt/{dataset}_finetune'
+                    args.logdir = f'expts/{model}_resnet_moments_pt/{dataset}_finetune'
                 else:
                     args.lin_probe = True
-                    args.logdir = f'expts/tsn_resnet_moments_pt/{dataset}_lin_probe'
+                    args.logdir = f'expts/{model}_resnet_moments_pt/{dataset}_lin_probe'
                 
                 args.weight_decay = wd
                 args.lr = lr
