@@ -39,7 +39,7 @@ if __name__ == '__main__':
         'uav_human' : [(64, 0.001, 0.0001), (64, 0.0005, 0.0001)],
     }
     
-    for dataset in ['diving48', 'ikea_furniture', 'uav_human']:
+    for dataset in ['diving48']:
         data_dir = data_base / dataset if dataset != 'mini_st2stv2' else data_base / 'something2something-v2'
         for (bs, lr, wd) in hyperparams[dataset]:
             args = set_common()
